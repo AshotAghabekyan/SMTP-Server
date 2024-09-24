@@ -19,8 +19,6 @@ export class MailSenderService {
             secure: true,
             maxMessages: 100,
             maxConnections: 50,
-            rateLimit: 10, 
-            socketTimeout: 10 * 60 * 1000,
             debug: true,
             disableFileAccess: true,
             auth: {
@@ -58,14 +56,19 @@ export class MailSenderService {
                 
         
             const result: PromiseSettledResult<any>[] = await Promise.allSettled(promises);
-            const fulfilledEmails: PromiseSettledResult<any>[] = result.filter((settledMail) => settledMail.status == "fulfilled");
-            const rejectedEmails: PromiseSettledResult<any>[] = result.filter((settledMail) => settledMail.status == "rejected");
-            return fulfilledEmails.length == mails.length? true : false;
+            const accpetedMails = this.parseFulfilledEmails(result);
+            return accpetedMails.length == mails.length? true : false;
         }
         catch(error) {
             console.log(error);
             return false;
         }
     }
-    
+
+
+    private parseFulfilledEmails(settledMails: PromiseSettledResult<any>[]) {
+        const fulfilledEmails: PromiseSettledResult<any>[] = settledMails.filter((settledMail) => settledMail.status == "fulfilled");
+        let accpetedMails: string[] = fulfilledEmails.map((mail) => mail['value']['accepted'].toString());
+        return accpetedMails;
+    };
 };
