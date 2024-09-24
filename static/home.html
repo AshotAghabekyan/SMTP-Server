@@ -10,13 +10,15 @@
   <div class="container">
     <h1>Mail Sender</h1>
 
-
     <div class="option-select">
       <label>
         <input type="radio" name="sendOption" id="manualOption" checked> Send Manually
       </label>
       <label>
         <input type="radio" name="sendOption" id="jsonOption"> Upload JSON
+      </label>
+      <label>
+        <input type="radio" name="sendOption" id="bulkOption"> Send to Multiple Emails (Same Content)
       </label>
     </div>
 
@@ -32,11 +34,22 @@
         <textarea id="message" name="message" rows="4" required></textarea>
       </div>
 
-
       <div id="jsonFields" style="display: none;">
         <label for="jsonFile">Upload JSON File:</label>
         <input type="file" id="jsonFile" name="jsonFile" accept=".json">
       </div>
+
+      <div id="bulkFields" style="display: none;">
+        <label for="bulkEmails">Emails (one per line):</label>
+        <textarea id="bulkEmails" name="bulkEmails" rows="4" required></textarea>
+      
+        <label for="bulkTitle">Title:</label>
+        <input type="text" id="bulkTitle" name="bulkTitle" required>
+      
+        <label for="bulkMessage">Message:</label>
+        <textarea id="bulkMessage" name="bulkMessage" rows="4" required></textarea>
+      </div>
+      
 
       <button type="submit">Send Email</button>
     </form>

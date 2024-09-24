@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "nodemon --exec ts-node app.ts",
-    "build": "tsc app.ts",
+    "build": "tsc",
     "type-check": "tsc --noEmit app.ts"
   },
   "keywords": [],

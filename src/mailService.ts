@@ -1,6 +1,6 @@
 import { Mail } from "./mailModel";
-import nodeMailer, {Transporter} from "nodemailer"
-import dotenv from "dotenv";
+import  nodeMailer, {Transporter} from "nodemailer"
+import  dotenv from "dotenv";
 import { promisify } from "util";
 
 
