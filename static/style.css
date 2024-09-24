@@ -1,0 +1,172 @@
+
+/* Основной стиль для всего сайта */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Контейнер формы */
+.container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+}
+
+/* Заголовок */
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+/* Переключатель между ручным вводом и JSON */
+.option-select {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.option-select label {
+  font-size: 16px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.option-select input[type="radio"] {
+  margin-right: 5px;
+}
+
+/* Общий стиль для формы */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Стили для меток */
+label {
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Стили для полей формы */
+input[type="email"], textarea, input[type="file"], input[type='text'], button {
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Кнопка отправки */
+button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  padding: 12px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#status {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: bold;
+  color: green;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  input[type="email"], textarea, input[type="file"], input[type='text'], button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .option-select label {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  input[type="email"], textarea, input[type="file"],input[type='text'], button {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .option-select label {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding: 40px;
+  }
+
+  .container {
+    max-width: 600px;
+    padding: 30px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  input[type="email"], textarea, input[type="file"], input[type='text'], button {
+    font-size: 18px;
+    padding: 14px;
+  }
+
+  .option-select label {
+    font-size: 18px;
+  }
+}
