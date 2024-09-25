@@ -5,14 +5,13 @@ import type {Express, Request, Response } from "express";
 import mailRouter from "./src/mailRouter";
 import path from "path";
 import fs from "fs";
-import config from "./src/consts/config";
 
 
 dotnenv.config()
 const app: Express = express();
 const httpsCredentials = {
-    cert: fs.readFileSync('./selfsigned.crt', "utf-8"),
-    key: fs.readFileSync('./selfsigned.key', "utf-8"),
+    cert: fs.readFileSync('./cert/selfsigned.crt', "utf-8"),
+    key: fs.readFileSync('./cert/selfsigned.key', "utf-8"),
 }
 
 
