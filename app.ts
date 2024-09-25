@@ -1,13 +1,20 @@
 import dotnenv from "dotenv"
 import express from "express"
+import https from "https";
 import type {Express, Request, Response } from "express";
 import mailRouter from "./src/mailRouter";
 import path from "path";
 import fs from "fs";
+import config from "./src/consts/config";
 
 
 dotnenv.config()
 const app: Express = express();
+const httpsCredentials = {
+    cert: fs.readFileSync('./selfsigned.crt', "utf-8"),
+    key: fs.readFileSync('./selfsigned.key', "utf-8"),
+}
+
 
 app.use("/static", express.static("./static"));
 app.use(express.json());
@@ -22,5 +29,8 @@ app.get("/", async (req: Request, res: Response) => {
     res.end();
 })
 
-
-app.listen(process.env.PORT, () => console.log('server running'));
+const http_port = +process.env.PORT
+const https_port = +process.env.HTTPS_PORT
+const httpsServer = https.createServer(httpsCredentials, app);
+httpsServer.listen(https_port, () => console.log('https server running on ', https_port))
+app.listen(http_port, () => console.log('http server running on', http_port));
