@@ -5,6 +5,7 @@ import mailRouter from "./src/mailRouter";
 import path from "path";
 import fs from "fs";
 
+
 dotnenv.config()
 const app: Express = express();
 
@@ -18,7 +19,7 @@ app.get("/", async (req: Request, res: Response) => {
     const file: string = await fs.promises.readFile(htmlFilePath, "utf-8");
     res.setHeader("Content-type", 'text/html');
     res.status(200).send(file);
-    res.end()
+    res.end();
 })
 
 

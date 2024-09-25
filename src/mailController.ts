@@ -1,23 +1,23 @@
 import { Request, Response } from "express";
 import { MailSenderService } from "./mailService";
 import { Mail } from "./mailModel";
-
+import logs from "./consts/logs";
 
 export class MailSenderController {
-    private mailSender: MailSenderService;
+    private mailSenderService: MailSenderService;
 
     constructor() {
-        this.mailSender = new MailSenderService();
+        this.mailSenderService = new MailSenderService();
     }
 
     public async sendMail(req: Request, res: Response) {
         try {
             const mails:  Mail[] = req.body;
-            const sendingResult = await this.mailSender.sendMail(mails);
+            const sendingResult = await this.mailSenderService.sendMail(mails);
             if (sendingResult) {
-                return res.status(200).json({message: ""}).end();
+                return res.status(204).end();
             }
-            throw new Error(`couldn't send an email to the gmail account(s)`);
+            throw new Error(logs.error.mails_couldnt_sent);
         }
         catch(error) {
             console.log(error);
