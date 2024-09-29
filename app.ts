@@ -1,10 +1,11 @@
 import dotnenv from "dotenv"
 import express from "express"
-import https from "https";
+import https, { Server } from "https";
 import type {Express, Request, Response } from "express";
 import mailRouter from "./src/mailRouter";
 import path from "path";
 import fs from "fs";
+import formidable from 'express-formidable';
 
 
 dotnenv.config()
@@ -15,8 +16,10 @@ const httpsCredentials = {
 }
 
 
+app.use(formidable({"multiples": true, "type": "multipart"}));
+// app.use(express.urlencoded({"extended": true}));
 app.use("/static", express.static("./static"));
-app.use(express.json());
+// app.use(express.json());
 app.use("/mail", mailRouter);
 
 
@@ -28,8 +31,8 @@ app.get("/", async (req: Request, res: Response) => {
     res.end();
 })
 
-const http_port = +process.env.PORT
-const https_port = +process.env.HTTPS_PORT
-const httpsServer = https.createServer(httpsCredentials, app);
-httpsServer.listen(https_port, () => console.log('https server running on ', https_port))
+const http_port: number = +process.env.PORT
+const https_port: number = +process.env.HTTPS_PORT
+const httpsServer: Server = https.createServer(httpsCredentials, app);
+httpsServer.listen(https_port, () => console.log('https server running on ', https_port));
 app.listen(http_port, () => console.log('http server running on', http_port));

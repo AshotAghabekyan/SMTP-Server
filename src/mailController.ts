@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { MailSenderService } from "./mailService";
-import { Mail } from "./mailModel";
+import { AttachedFile, Mail } from "./mailModel";
 import logs from "./consts/logs";
+import formidable from "formidable"
 
 export class MailSenderController {
     private mailSenderService: MailSenderService;
@@ -12,8 +13,18 @@ export class MailSenderController {
 
     public async sendMail(req: Request, res: Response) {
         try {
-            const mails:  Mail[] = req.body;
-            const sendingResult = await this.mailSenderService.sendMail(mails);
+            const emailInfo = req.fields;
+            let attachedRawFiles: formidable.File[] = req.files.attachedFiles;
+            if (!Array.isArray(attachedRawFiles)) {
+                attachedRawFiles = [attachedRawFiles]              
+            }
+
+            const destinationEmail = emailInfo.email.toString();
+            const title = emailInfo.title.toString();
+            const message = emailInfo.message.toString();
+            const mail: Mail = new Mail(destinationEmail, title, message)
+
+            const sendingResult: boolean = await this.mailSenderService.sendMail([mail], attachedRawFiles);
             if (sendingResult) {
                 return res.status(204).end();
             }

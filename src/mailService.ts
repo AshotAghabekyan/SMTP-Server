@@ -1,11 +1,10 @@
-import { Mail } from "./mailModel";
+import { AttachedFile, Mail } from "./mailModel";
 import  nodeMailer, {Transporter} from "nodemailer"
-import  dotenv from "dotenv";
 import { promisify } from "util";
 import config from "./consts/config";
 import logs from "./consts/logs";
-
-dotenv.config();
+import { FileParsingService } from "./fileParsingService";
+import formidable from "formidable"
 
 
 function createHtmlResponse(mail: Mail): string {
@@ -53,39 +52,46 @@ function createHtmlResponse(mail: Mail): string {
 export class MailSenderService {
     private transporter: Transporter;
     private sendMailPromise: Function;
+    private fileParsingService: FileParsingService;
 
     constructor() {
-            this.transporter = nodeMailer.createTransport({
-            service: 'gmail',
-            host: config.smtp_host,
-            port: config.smtp_port,
-            pool: true,
-            secure: true,
-            maxMessages: 100,
-            maxConnections: 50,
-            debug: true,
-            disableFileAccess: true,
-            auth: {
-                "user": config.smtp_sender_email,
-                "pass": config.email_app_password,
-            }
-        })
+        this.fileParsingService = new FileParsingService();
+        this.transporter = nodeMailer.createTransport({
+        service: 'gmail',
+        host: config.smtp_host,
+        port: config.smtp_port,
+        pool: true,
+        secure: true,
+        maxMessages: 100,
+        maxConnections: 50,
+        disableFileAccess: false,
+        debug: true,
+        auth: {
+            "user": config.smtp_sender_email,
+            "pass": config.email_app_password,
+        }
+      })
 
-        this.transporter.verify((err) => {
-            if (err) {
-                console.log(err);
-                throw new Error(logs.error.smtp_connection)
-            }
-            console.log(logs.success.smtp_connection)
-        });
+      this.transporter.verify((err) => {
+        if (err) {
+            console.log(err);
+            throw new Error(logs.error.smtp_connection)
+        }
+        console.log(logs.success.smtp_connection)
+      });
 
-        this.sendMailPromise = promisify(this.transporter.sendMail.bind(this.transporter));
+      this.sendMailPromise = promisify(this.transporter.sendMail.bind(this.transporter));
     }
 
 
 
-    public async sendMail(mails: Mail[]): Promise<boolean> {
+    public async sendMail(mails: Mail[], attachedRawFiles: formidable.File[]): Promise<boolean> {
         try {
+            // console.log("file --->", attachedRawFiles);
+            let parsedAttachedFiles: AttachedFile[] = null;
+            if (attachedRawFiles.length > 0) {
+              parsedAttachedFiles = this.fileParsingService.parse(attachedRawFiles);
+            }
             const promises: Promise<any>[] = mails.map((mail: Mail) => {
                 const message = {
                     priority: "high",
@@ -93,6 +99,7 @@ export class MailSenderService {
                     to: mail.email,
                     subject: mail.title,
                     html: createHtmlResponse(mail),
+                    attachments: parsedAttachedFiles,
                 };
                 const promise = this.sendMailPromise(message);
                 return promise;

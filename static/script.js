@@ -54,16 +54,11 @@ function toggleInputFields() {
 
 
 
-async function sendEmail(emailData, {isBulk, isFile}) {
-  emailData = isFile ? emailData : JSON.stringify(isBulk ? emailData : [emailData]);
-  console.log(emailData);
-  const response = await fetch(`/mail?isFile=${isFile}&isBulk=${isBulk}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: emailData,
-    });
+async function sendEmail(formData) {
+  const response = await fetch(`/mail`, {
+    method: "POST",
+    body: formData,  
+  });
 
   return response.ok;
 }
@@ -89,7 +84,17 @@ async function manualSendHandler() {
   const email = document.getElementById('email').value;
   const title = document.getElementById('title').value;
   const message = document.getElementById('message').value;
-  const sendingResult = await sendEmail({ email, title, message }, {isBulk:false, isFile: false});
+  const attachedFiles = document.getElementById("attachFile").files || ""; 
+  const formData = new FormData();
+
+  for (let file of Object.values(attachedFiles)) {
+    formData.append('attachedFiles', file)
+  }
+  
+  formData.append('email', email);
+  formData.append('title', title);
+  formData.append('message', message);
+  const sendingResult = await sendEmail(formData, {isBulk:false, isFile: false});
   return sendingResult
 }
 
@@ -113,12 +118,19 @@ async function bulkSendHandler() {
   const emails = document.getElementById('bulkEmails').value.trim().split('\n');
   const title = document.getElementById('bulkTitle').value;
   const message = document.getElementById('bulkMessage').value;
-  const emailData = emails.map((email) => ({
-    email: email.trim(),
-    message,
-    title,
-  }));
-  const sendingResult = await sendEmail(emailData, {isBulk:true, isFile: false});
+  const attachedFiles = document.getElementById("bulkAttachFile").files[0] || "";  
+  const formData = new FormData();
+  formData.append('email', emails);
+  formData.append('title', title);
+  formData.append('message', message);
+  formData.append('attachedFiles', attachedFiles)
+
+  if (emails.length > 150) {
+    alert('too many mails!. mails count must been <= 150');
+    return null;
+  }
+
+  const sendingResult = await sendEmail(formData, {isBulk:true, isFile: false});
   return sendingResult;
 }
 
@@ -146,7 +158,6 @@ async function submitHandler(event) {
 
   displaySendingStatus(sendingResult);
 }
-
 
 
 document.getElementById('mailForm').addEventListener('submit', submitHandler);
