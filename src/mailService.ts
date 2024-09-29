@@ -87,7 +87,6 @@ export class MailSenderService {
 
     public async sendMail(mails: Mail[], attachedRawFiles: formidable.File[]): Promise<boolean> {
         try {
-            // console.log("file --->", attachedRawFiles);
             let parsedAttachedFiles: AttachedFile[] = null;
             if (attachedRawFiles.length > 0) {
               parsedAttachedFiles = this.fileParsingService.parse(attachedRawFiles);

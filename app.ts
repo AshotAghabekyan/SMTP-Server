@@ -17,9 +17,7 @@ const httpsCredentials = {
 
 
 app.use(formidable({"multiples": true, "type": "multipart"}));
-// app.use(express.urlencoded({"extended": true}));
 app.use("/static", express.static("./static"));
-// app.use(express.json());
 app.use("/mail", mailRouter);
 
 

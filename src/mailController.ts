@@ -15,7 +15,11 @@ export class MailSenderController {
         try {
             const emailInfo = req.fields;
             let attachedRawFiles: formidable.File[] = req.files.attachedFiles;
-            if (!Array.isArray(attachedRawFiles)) {
+            console.log('file', attachedRawFiles);
+            if (!attachedRawFiles) {
+                attachedRawFiles = [];
+            }
+            else if (!Array.isArray(attachedRawFiles)) {
                 attachedRawFiles = [attachedRawFiles]              
             }
 
