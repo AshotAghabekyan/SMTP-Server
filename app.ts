@@ -2,19 +2,19 @@ import dotnenv from "dotenv"
 import express from "express"
 import https, { Server } from "https";
 import type {Express, Request, Response } from "express";
-import mailRouter from "./src/mailRouter";
+import mailRouter from "./src/router/mailRouter";
 import path from "path";
 import fs from "fs";
 import formidable from 'express-formidable';
 
-
 dotnenv.config()
-const app: Express = express();
 const httpsCredentials = {
     cert: fs.readFileSync('./cert/selfsigned.crt', "utf-8"),
     key: fs.readFileSync('./cert/selfsigned.key', "utf-8"),
 }
 
+
+const app: Express = express();
 
 app.use(formidable({"multiples": true, "type": "multipart"}));
 app.use("/static", express.static("./static"));
@@ -34,3 +34,6 @@ const https_port: number = +process.env.HTTPS_PORT
 const httpsServer: Server = https.createServer(httpsCredentials, app);
 httpsServer.listen(https_port, () => console.log('https server running on ', https_port));
 app.listen(http_port, () => console.log('http server running on', http_port));
+
+
+

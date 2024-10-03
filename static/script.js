@@ -3,8 +3,9 @@
 
 document.addEventListener('DOMContentLoaded', toggleInputFields);
 document.getElementById('manualOption').addEventListener('change', toggleInputFields);
-document.getElementById('jsonOption').addEventListener('change', toggleInputFields);
 document.getElementById('bulkOption').addEventListener('change', toggleInputFields);
+document.getElementById('csvOption').addEventListener('change', toggleInputFields);
+
 
 function reload() {
   setTimeout(window.reload, 1500);
@@ -14,8 +15,9 @@ function reload() {
 function toggleInputFields() {
   try {
     const manualFields = document.getElementById('manualFields');
-    const jsonFields = document.getElementById('jsonFields');
     const bulkFields = document.getElementById('bulkFields');
+    const csvFields = document.getElementById("csvFields");
+
     const emailInput = document.getElementById('email');
     const messageInput = document.getElementById('message');
     const titleInput = document.getElementById('title');
@@ -34,25 +36,26 @@ function toggleInputFields() {
   
     if (document.getElementById('manualOption').checked) {
       manualFields.style.display = 'block';
-      jsonFields.style.display = 'none';
       bulkFields.style.display = 'none';
+      csvFields.style.display = "none";
       emailInput.required = true;  
       messageInput.required = true; 
       titleInput.required = true;
     } 
-    else if (document.getElementById('jsonOption').checked) {
+    else if (document.getElementById('bulkOption').checked) {
       manualFields.style.display = 'none';
-      jsonFields.style.display = 'block';
-      bulkFields.style.display = 'none';
-  
-    } else if (document.getElementById('bulkOption').checked) {
-      manualFields.style.display = 'none';
-      jsonFields.style.display = 'none';
+      csvFields.style.display = "none";
       bulkFields.style.display = 'block';
       bulkEmailsInput.required = true;
       bulkMessageInput.required = true;
       bulkTitleInput.required = true;
     }
+    else if (document.getElementById("csvOption").checked) {
+      manualFields.style.display = 'none';
+      bulkFields.style.display = 'none';
+      csvFields.style.display = "block";
+    }
+    
   }
   catch(error) {
     console.log(error);
@@ -62,9 +65,9 @@ function toggleInputFields() {
 
 
 
-async function sendEmail(formData) {
+async function sendEmail(formData, uploadType = 'manual') {
   try {
-    const response = await fetch(`/mail`, {
+    const response = await fetch(`/mail/${uploadType}`, {
       method: "POST",
       body: formData,  
     });
@@ -100,6 +103,7 @@ async function manualSendHandler() {
     const title = document.getElementById('title').value;
     const message = document.getElementById('message').value;
     const attachedFiles = document.getElementById("attachFile").files || ""; 
+    console.log(attachedFiles);
     const formData = new FormData();
   
     for (let file of Object.values(attachedFiles)) {
@@ -109,7 +113,7 @@ async function manualSendHandler() {
     formData.append('email', email);
     formData.append('title', title);
     formData.append('message', message);
-    const sendingResult = await sendEmail(formData, {isBulk:false, isFile: false});
+    const sendingResult = await sendEmail(formData, "manual");
     return sendingResult
   }
   catch(error) {
@@ -120,19 +124,20 @@ async function manualSendHandler() {
 
 
 
-async function fileSendHander() {
+async function csvSendHandler() {
   try {
-    const jsonFile = document.getElementById('jsonFile').files[0];
-    if (jsonFile) {
-      const sendingResult = await sendEmail(jsonFile, {isBulk:false, isFile: true});
-      return sendingResult
+    const csvFile = document.getElementById('csvFile').files[0];
+    const attachedFiles = document.getElementById("attachTicketFiles").files || "";
+    const formData = new FormData();
+
+    formData.append('csvFile', csvFile);
+    for (let file of Object.values(attachedFiles)) {
+      formData.append('attachedFiles', file);
     }
-    else {
-      alert('Please upload a JSON file.');
-      return null;
-    }
-  }
-  catch(error) {
+
+    const sendingResult = await sendEmail(formData, "csv");
+    return sendingResult;
+  } catch (error) {
     console.log(error);
     return null;
   }
@@ -161,7 +166,7 @@ async function bulkSendHandler() {
       return null;
     }
   
-    const sendingResult = await sendEmail(formData, {isBulk:true, isFile: false});
+    const sendingResult = await sendEmail(formData, "bulk");
     return sendingResult;
   }
   catch(error) {
@@ -177,8 +182,8 @@ async function submitHandler(event) {
     event.preventDefault();
     const status = document.getElementById('status');
     const manualOptionChecked = document.getElementById('manualOption').checked;
-    const jsonOptionChecked = document.getElementById('jsonOption').checked;
     const bulkOptionChecked = document.getElementById('bulkOption').checked;
+    const csvOptionChecked = document.getElementById("csvOption").checked;
     let sendingResult = null;
     status.innerText = 'In Progress, please wait';
     status.style.color = 'yellow';
@@ -186,11 +191,11 @@ async function submitHandler(event) {
     if (manualOptionChecked) {
       sendingResult = await manualSendHandler();
     } 
-    else if (jsonOptionChecked) {
-      sendingResult = await fileSendHander()
-    } 
     else if (bulkOptionChecked) {
       sendingResult = await bulkSendHandler()
+    }
+    else if (csvOptionChecked) {
+      sendingResult = await csvSendHandler()
     }
   
     displaySendingStatus(sendingResult);

@@ -1,0 +1,1 @@
+{"version":3,"file":"mailRouter.js","sourceRoot":"","sources":["../../src/mailRouter.ts"],"names":[],"mappings":";;AAAA,qCAAiC;AACjC,qDAAwD;AAGxD,MAAM,gBAAgB,GAAG,IAAI,qCAAoB,EAAE,CAAC;AACpD,MAAM,MAAM,GAAG,IAAA,gBAAM,GAAE,CAAC;AACxB,kBAAe,MAAM,CAAC;AACtB,MAAM,CAAC,IAAI,CAAC,GAAG,EAAE,gBAAgB,CAAC,QAAQ,CAAC,IAAI,CAAC,gBAAgB,CAAC,CAAC,CAAC"}
