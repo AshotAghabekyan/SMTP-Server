@@ -76,9 +76,12 @@ export class MailSenderController {
 
     public async csvUploadHandler(req: Request, res: Response) {
         try {
+            const emailInfo = req.fields;
+            const title = emailInfo.title.toString();
+            const message = emailInfo.message.toString();
             const csvFile: formidable.File[] = req.files.csvFile;
             let attachedRawFiles: formidable.File[] = req.files.attachedFiles;
-    
+            
             if (!attachedRawFiles) {
                 attachedRawFiles = [];
             }
@@ -86,7 +89,7 @@ export class MailSenderController {
                 attachedRawFiles = [attachedRawFiles]              
             }
     
-            let sendingResult: boolean = await this.csvUploadService.send(csvFile, attachedRawFiles);
+            let sendingResult: boolean = await this.csvUploadService.send(title, message, csvFile, attachedRawFiles);
             if (sendingResult) {
                 return res.status(204);
             }

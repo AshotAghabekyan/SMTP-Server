@@ -9,49 +9,11 @@ import formidable from "formidable"
 import {GoogleApis} from "googleapis/build/src/googleapis"
 import {GetAccessTokenResponse} from "google-auth-library/build/src/auth/oauth2client";
 import { GoogleSheet } from "../models/googleSheetModel";
+import mailMessageHtml from "../consts/mailMessageHtml";
+
 
 
 let google: GoogleApis = new GoogleApis();
-function createHtmlResponse(mail: Mail): string {
-    const message = `
-    <html>
-    <head>
-      <style>
-        h3 {
-          color: #333;
-          font-family: Arial, sans-serif;
-        }
-        .content {
-          background-color: #f9f9f9;
-          padding: 20px;
-          border: 1px solid #ddd;
-          border-radius: 5px;
-          font-size: 16px;
-        }
-        .footer {
-          margin-top: 20px;
-          font-size: 12px;
-          color: #777;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="content">
-        <div style="text-align: center;">
-            <img src="https://darpass.com/wp-content/uploads/2024/05/WCIT-2024-DigiTec-scaled.jpg" alt="WCIT 2024" style="max-width: 100%; height: 200px;">
-        </div>
-        <h3>${mail.title}</h3>
-        <p>${mail.message}</p>
-      </div>
-      <div class="footer">
-        <p>Best regards,<br>WCIT Team</p>
-      </div>
-    </body>
-    </html>
-  `
-  return message;
-}
-
 
 
 class MailSenderService {
@@ -99,7 +61,7 @@ class MailSenderService {
 
 
 
-    private async initTransporter() {
+    private async initTransporter(): Promise<Transporter> {
       const clientId: string = config.google_client_id;
       const clientSecret: string = config.google_client_secret;
       const accessToken: GetAccessTokenResponse = await this.initOauth(clientId, clientSecret);
@@ -123,17 +85,18 @@ class MailSenderService {
           "user": config.smtp_sender_email,
       }
     })
+    return this.transporter;
   }
 
 
-    public async sendMail(mail: Mail, attachedFiles: AttachedFile[]): Promise<boolean> {
+    public async sendMail(mail: Mail, attachedFiles?: AttachedFile[]): Promise<boolean> {
         try {
             const message = {
               priority: "high",
               from: `WCIT <${config.smtp_sender_email}>`,
               to: mail.email,
               subject: mail.title,
-              html: createHtmlResponse(mail),
+              html: mailMessageHtml(mail),
               attachments: attachedFiles,
           };
           const sendingResult = await this.sendMailPromise(message);
@@ -144,24 +107,6 @@ class MailSenderService {
             return false;
         }
     }
-
-
-    // // private foo() {
-    // //   let parsedAttachedFiles: AttachedFile[] = null;
-    // //   if (attachedRawFiles.length > 0) {
-    // //     parsedAttachedFiles = this.fileParsingService.parse(attachedRawFiles);
-    // //   }
-    // // }
-
-    // private parseFulfilledEmails(settledMails: PromiseSettledResult<any>[]) {
-    //     let acceptedMails: string[] = settledMails.map((settledMail) => {
-    //         if (settledMail.status == 'fulfilled') {
-    //           return settledMail['value']['accepted'].toString()
-
-    //         }
-    //     })
-    //     return acceptedMails;
-    // };
 };
 
 
@@ -197,23 +142,20 @@ export class CsvUploadService {
   private csvFileParser: CsvFileParserService = new CsvFileParserService();
   private fileParser: FileParserService = new FileParserService();
 
-  public async send(csvFile:formidable.File[], attachedRawFiles: formidable.File[]) {
+  public async send(title: string, message: string, csvFile: formidable.File[], attachedRawFiles: formidable.File[]) {
     try {
       const parsedCsvFile: GoogleSheet[] = await this.csvFileParser.parse(csvFile['path']);
       const attachedFiles: AttachedFile[] = [];
+
       for (let rawFile of attachedRawFiles) {
         const parsedFile: AttachedFile = this.fileParser.parse(rawFile['path'], rawFile['name']);
         attachedFiles.push(parsedFile);
       }
       
       for (let sheet of parsedCsvFile) {
-        const filteredAttachedFiles: AttachedFile[] = attachedFiles.filter((file: AttachedFile) => {
-          const extensionIndex = file.filename.lastIndexOf('.');
-          let filename = file.filename.substring(0, extensionIndex);
-          return filename == sheet.mail
-        })
-        const mail: Mail = new Mail(sheet.mail, 'some title', 'frf');
-        let res = await this.mailer.sendMail(mail, filteredAttachedFiles);
+        const personEmail = sheet.mail;
+        const mailEntity: Mail = new Mail(personEmail, title, message);
+        let res = await this.mailer.sendMail(mailEntity, attachedFiles);
         return res;
       }
     }

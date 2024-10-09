@@ -4,7 +4,6 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "nodemon --exec ts-node app.ts",
-    "start": "nodemon --exec ts-node start.ts",
     "build": "tsc",
     "type-check": "tsc --noEmit app.ts"
   },

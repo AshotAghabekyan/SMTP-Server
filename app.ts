@@ -13,6 +13,7 @@ const httpsCredentials = {
     key: fs.readFileSync('./cert/selfsigned.key', "utf-8"),
 }
 
+console.log(process.env);
 
 const app: Express = express();
 

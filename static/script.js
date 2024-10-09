@@ -25,13 +25,18 @@ function toggleInputFields() {
     const bulkEmailsInput = document.getElementById("bulkEmails");
     const bulkMessageInput = document.getElementById("bulkMessage");
     const bulkTitleInput = document.getElementById("bulkTitle");
-  
+    
+    const csvMessageInput = document.getElementById("csvMessage");
+    const csvTitleInput = document.getElementById("csvTitle")
+
     emailInput.required = false;  
     messageInput.required = false; 
     titleInput.required = false;
     bulkEmailsInput.required = false;
     bulkMessageInput.required = false;
     bulkTitleInput.required = false;
+    csvMessageInput.required = false;
+    csvTitleInput.required = false
   
   
     if (document.getElementById('manualOption').checked) {
@@ -54,6 +59,8 @@ function toggleInputFields() {
       manualFields.style.display = 'none';
       bulkFields.style.display = 'none';
       csvFields.style.display = "block";
+      csvTitleInput.required = true;
+      csvMessageInput.required = true;
     }
     
   }
@@ -126,10 +133,14 @@ async function manualSendHandler() {
 
 async function csvSendHandler() {
   try {
+    const title = document.getElementById("csvTitle");
+    const message = document.getElementById("csvMessage");
     const csvFile = document.getElementById('csvFile').files[0];
-    const attachedFiles = document.getElementById("attachTicketFiles").files || "";
+    const attachedFiles = document.getElementById("csvAttachFiles").files || "";
     const formData = new FormData();
-
+    
+    formData.append("title", title);
+    formData.append("message", message);
     formData.append('csvFile', csvFile);
     for (let file of Object.values(attachedFiles)) {
       formData.append('attachedFiles', file);

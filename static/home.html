@@ -20,7 +20,7 @@
         <input type="radio" name="sendOption" id="bulkOption"> Send to Multiple Emails (Same Content)
       </label>
       <label>
-        <input type="radio" name="sendOption" id="csvOption"> Upload CSV 
+        <input type="radio" name="sendOption" id="csvOption">  Get an emails from a csv (excel) file | (Send Same Content)
       </label>
     </div>
 
@@ -58,8 +58,14 @@
         <label for="csvFile">Upload CSV file:</label>
         <input type="file" id="csvFile" accept=".csv">
 
-        <label for="attachTicketFiles">Attach files</label>
-        <input type="file" id="attachTicketFiles" multiple name="attachTikcetFiles" accept=".*" >
+        <label for="csvTitle">Title:</label>
+        <input type="text" id="csvTitle" required>
+
+        <label for="csvMessage">Message:</label>
+        <textarea id="csvMessage" rows="4" required></textarea>
+
+        <label for="csvAttachFiles">Attach files</label>
+        <input type="file" id="attachFiles" multiple name="attachTFiles" accept=".*" >
       </div>
 
       <button type="submit">Send Email</button>
