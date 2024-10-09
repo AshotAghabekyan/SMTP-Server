@@ -1,0 +1,1 @@
+{"version":3,"file":"mailModel.js","sourceRoot":"","sources":["../../../src/models/mailModel.ts"],"names":[],"mappings":";;;AAKA,MAAa,IAAI;IAKb,YAAY,KAAa,EAAE,KAAa,EAAE,OAAe;QACrD,IAAI,CAAC,KAAK,GAAG,KAAK,CAAC;QACnB,IAAI,CAAC,KAAK,GAAG,KAAK,CAAC;QACnB,IAAI,CAAC,OAAO,GAAG,OAAO,CAAC;IAC3B,CAAC;CACJ;AAVD,oBAUC;AAGD,MAAa,gBAAgB;CAG5B;AAHD,4CAGC"}

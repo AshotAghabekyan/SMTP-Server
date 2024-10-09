@@ -15,17 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const https_1 = __importDefault(require("https"));
-const mailRouter_1 = __importDefault(require("./src/mailRouter"));
+const mailRouter_1 = __importDefault(require("./src/router/mailRouter"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const express_formidable_1 = __importDefault(require("express-formidable"));
 dotenv_1.default.config();
-const app = (0, express_1.default)();
-exports.default = app;
 const httpsCredentials = {
     cert: fs_1.default.readFileSync('./cert/selfsigned.crt', "utf-8"),
     key: fs_1.default.readFileSync('./cert/selfsigned.key', "utf-8"),
 };
+console.log(process.env);
+const app = (0, express_1.default)();
 app.use((0, express_formidable_1.default)({ "multiples": true, "type": "multipart" }));
 app.use("/static", express_1.default.static("./static"));
 app.use("/mail", mailRouter_1.default);
