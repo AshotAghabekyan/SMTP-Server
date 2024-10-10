@@ -72,8 +72,8 @@ class MailSenderService {
       port: config.smtp_port,
       pool: true,
       secure: true,
-      maxMessages: 100,
-      maxConnections: 50,
+      maxMessages: 10,
+      maxConnections: 5,
       disableFileAccess: false,
       debug: true,
       auth: {
@@ -89,7 +89,7 @@ class MailSenderService {
   }
 
 
-    public async sendMail(mail: Mail, attachedFiles?: AttachedFile[]): Promise<boolean> {
+    public async sendMail(mail: Mail, attachedFiles?: AttachedFile[]): Promise<unknown> {
         try {
             const message = {
               priority: "high",
@@ -99,8 +99,8 @@ class MailSenderService {
               html: mailMessageHtml(mail),
               attachments: attachedFiles,
           };
-          const sendingResult = await this.sendMailPromise(message);
-          return sendingResult;
+          const promiseSending: Promise<unknown> = this.sendMailPromise(message);
+          return promiseSending;
         }
         catch(error) {
             console.log(error);
@@ -124,8 +124,8 @@ export class ManualUploadService {
         attachedFiles.push(parsedFile);
       }
       
-      const isSuccessSending: boolean = await this.mailer.sendMail(mails, attachedFiles);
-      return isSuccessSending;
+      const isSuccessSending: unknown = await this.mailer.sendMail(mails, attachedFiles);
+      return Boolean(isSuccessSending);
     }
     catch(error) {
       console.log(error);
@@ -152,16 +152,46 @@ export class CsvUploadService {
         attachedFiles.push(parsedFile);
       }
       
+      const mailQueue: Mail[] = [];
+
       for (let sheet of parsedCsvFile) {
         const personEmail = sheet.mail;
         const mailEntity: Mail = new Mail(personEmail, title, message);
-        let res = await this.mailer.sendMail(mailEntity, attachedFiles);
-        return res;
+        mailQueue.push(mailEntity);
       }
+
+      await this.processMailQueue(mailQueue);
+      return true;
     }
     catch(error) {
       console.log(error);
       return null;
+    }
+  }
+
+
+
+  private async processMailQueue(mails: Mail[], parallelSize = 5, delay = 1000) {
+    const invalidMailsQueue: Mail[] = [];
+    const chunk: Mail[] = mails.splice(0, parallelSize);
+
+    if (chunk.length > 0) {
+      try {
+        const scheduledMails = chunk.map((mail: Mail) => this.mailer.sendMail(mail));
+        await Promise.all(scheduledMails);
+      } 
+      catch(error) {
+        console.log("mailer error: ", error, "for chunk: ", chunk);
+        invalidMailsQueue.push(...chunk);
+      }
+      setTimeout(this.processMailQueue, delay, mails, parallelSize, delay);
+    }
+    else if (invalidMailsQueue.length > 0) {
+      mails.push(...invalidMailsQueue);
+      invalidMailsQueue.length = 0;
+    }
+    else {
+      console.log("all mails successful sended");
     }
   }
 }
